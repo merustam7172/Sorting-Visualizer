@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import "./App.css";
 import Visualiser from "./control/Visualiser";
 import Control from "./control/Control";
-import { bubbleSort } from "./algorithm/BubbleSort";
-import { MergeSort } from "./algorithm/MergeSort";
-import { selectionSort } from "./algorithm/SelectionSort";
+import { bubbleSort } from "./algorithm/BubbleSort.js";
+import { MergeSort } from "./algorithm/MergeSort.js";
+import { selectionSort } from "./algorithm/SelectionSort.js";
 
 
 function App() {
