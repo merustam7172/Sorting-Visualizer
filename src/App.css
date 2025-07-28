@@ -1,6 +1,9 @@
+body{
+  background: #8297CF;
+}
 .App {
   text-align: center;
-  background: linear-gradient(135deg, #f0f5ff 0%, #e6fffb 100%);
+  /* background: linear-gradient(135deg, #f0f5ff 0%, #e6fffb 100%); */
   min-height: 100vh;
   padding: 2rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -18,9 +21,11 @@
 
 .App {
   text-align: center;
-  background: #f5f7fa;
+  background-color: #8297CF ;
   min-height: 100vh;
-  padding: 1rem;
-  font-family: sans-serif;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  transition: background 0.5s ease;
 }
 .App h1 { margin-bottom: 0.5rem; }
