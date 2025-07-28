@@ -1,168 +1,148 @@
-import React, { useEffect, useState } from "react";
-import "./App.css";
-import Visualiser from "./control/Visualiser";
+import React, { useState, useEffect, useRef } from "react";
 import Control from "./control/Control";
-import { bubbleSort } from "./algorithm/BubbleSort.js";
-import { MergeSort } from "./algorithm/MergeSort.js";
-import { selectionSort } from "./algorithm/SelectionSort.js";
-
+import Visualiser from "./control/Visualiser";
+import { bubbleSort } from "./algorithm/BubbleSort";
+import { MergeSort } from "./algorithm/MergeSort";
+import { selectionSort } from "./algorithm/SelectionSort";
+import "./App.css";
 
 function App() {
+  const [baseArray, setBaseArray] = useState([]);
   const [array, setArray] = useState([]);
-  const [userInuptArray, setUserInuptArray] = useState('');
+  const [algo, setAlgo] = useState("");
+  const [animations, setAnimations] = useState([]);
+  const [stepIdx, setStepIdx] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(100);
-  const [isSorting, setIsSorting] = useState(false);
-  const [selectedSorting, setSelectedSorting] = useState('');
 
+  const timerRef = useRef(null);
+
+  // Reset when baseArray changes
   useEffect(() => {
-    const userInput = userInuptArray.split(',');
-    const filteredInput = userInput.filter(item => !isNaN(item) && Number.isInteger(parseFloat(item))).map(item => Number(item) <= 500 && Number(item))
-    setArray([...filteredInput])
-  }, [userInuptArray])
+    setArray([...baseArray]);
+    setAnimations([]);
+    setStepIdx(0);
+    setIsPlaying(false);
+    clearTimeout(timerRef.current);
+  }, [baseArray]);
 
-  const handleNewArrayGenrate = () => {
-    const newArray = Array.from({ length: 15 }, () =>
-      Math.floor(Math.random() * 500)
-    );
-    setArray(newArray)
-  }
-  const reSet = () => {
-    setArray([])
-    setSelectedSorting('')
-  };
-  const handleSorting = (e) => {
-    const sortingMethod = e.target.value;
-    setSelectedSorting(sortingMethod);
-    setIsSorting(true);
-    let animationArr = [];
-    switch (sortingMethod) {
-      case 'bubbleSort':
-        animationArr = bubbleSort(array);
-        bubbleAnimation(animationArr)
-        break;
-      case "mergeSort":
-        animationArr = MergeSort(array);
-        animateMergeSorting(animationArr);
-        break;
-      case "selectionSort":
-        animationArr = selectionSort(array);
-        animateSelectionSorting(animationArr);
-        break;
-      default:
-        break;
+  // Advance one step
+  const doStep = () => {
+    if (stepIdx >= animations.length) {
+      setIsPlaying(false);
+      return;
     }
-  }
-  function bubbleAnimation(animation) {
-    const barEle = document.getElementsByClassName('bar');
-    for (let i = 0; i < animation.length; i++) {
-      let [barOneInd, bartwoInd, swap] = animation[i];
-      let barOne = barEle[barOneInd];
-      let barTwo = barEle[bartwoInd];
-      setTimeout(() => {
-        barOne.style.backgroundColor = swap ? 'red' : 'yellow';
-        barTwo.style.backgroundColor = swap ? 'red' : 'yellow';
-        if (swap) {
-          const heightTemp = barOne.style.height;
-          barOne.style.height = barTwo.style.height;
-          barTwo.style.height = heightTemp;
-          const content = barOne.innerText;
-          barOne.innerText = barTwo.innerText;
-          barTwo.innerText = content;
-        }
-        setTimeout(() => {
-          barOne.style.backgroundColor = 'blue'
-          barTwo.style.backgroundColor = 'blue'
-        }, speed)
-      }, i * speed);
-    }
-    setTimeout(() => {
-      for (let j = 0; j < barEle.length; j++) {
-        setTimeout(() => {
-          barEle[j].style.backgroundColor = 'green';
-        }, j * speed);
+    const anim = animations[stepIdx];
+
+    // Apply the animation
+    if (Array.isArray(anim)) {
+      // [i, j, swapFlag]
+      const [i, j, swapFlag] = anim;
+      if (swapFlag) {
+        setArray(arr => {
+          const a = [...arr];
+          [a[i], a[j]] = [a[j], a[i]];
+          return a;
+        });
       }
-      setIsSorting(false);
-    }, animation.length * speed)
-  }
-  const animateMergeSorting = (animations) => {
-    const bars = document.getElementsByClassName("bar");
-    for (let i = 0; i < animations.length; i++) {
-      const isColorChange = i % 3 !== 2;
-      if (isColorChange) {
-        const [barOneIdx, barTwoIdx] = animations[i];
-        const barOne = bars[barOneIdx];
-        const barTwo = bars[barTwoIdx];
-        const color = i % 3 === 0 ? "yellow" : "blue";
-        setTimeout(() => {
-          barOne.style.backgroundColor = color;
-          barTwo.style.backgroundColor = color;
-        }, i * speed);
-      } else {
-        setTimeout(() => {
-          const [barOneIdx, newHeight] = animations[i];
-          const barOne = bars[barOneIdx];
-          barOne.style.height = `${newHeight}px`;
-          barOne.innerHTML = newHeight;
-        }, i * speed);
+    } else {
+      // MergeSort object: { type, ... }
+      if (anim.type === 'overwrite') {
+        setArray(arr => {
+          const a = [...arr];
+          a[anim.index] = anim.value;
+          return a;
+        });
       }
     }
 
-    setTimeout(() => {
-      for (let j = 0; j < bars.length; j++) {
-        setTimeout(() => {
-          bars[j].style.backgroundColor = "green";
-        }, j * speed);
-      }
-      setIsSorting(false);
-    }, animations.length * speed);
+    setStepIdx(s => s + 1);
   };
-  const animateSelectionSorting = (animations) => {
-    const bars = document.getElementsByClassName("bar");
-    for (let i = 0; i < animations.length; i++) {
-      const [barOneIdx, barTwoIdx, swap] = animations[i];
-      const barOne = bars[barOneIdx];
-      const barTwo = bars[barTwoIdx];
-      setTimeout(() => {
-        barOne.style.backgroundColor = swap ? "red" : "yellow";
-        barTwo.style.backgroundColor = swap ? "red" : "yellow";
-        if (swap) {
-          const tempHeight = barOne.style.height;
-          barOne.style.height = barTwo.style.height;
-          barTwo.style.height = tempHeight;
-          const tempContent = barOne.innerHTML;
-          barOne.innerHTML = barTwo.innerHTML;
-          barTwo.innerHTML = tempContent;
-        }
-        setTimeout(() => {
-          barOne.style.backgroundColor = "blue";
-          barTwo.style.backgroundColor = "blue";
-        }, speed);
-      }, i * speed);
+
+  // Auto-play effect
+  useEffect(() => {
+    if (isPlaying) {
+      timerRef.current = setTimeout(doStep, speed);
     }
-    setTimeout(() => {
-      for (let j = 0; j < bars.length; j++) {
-        setTimeout(() => {
-          bars[j].style.backgroundColor = "green";
-        }, j * speed);
-      }
-      setIsSorting(false);
-    }, animations.length * speed);
+    return () => clearTimeout(timerRef.current);
+  }, [isPlaying, stepIdx, speed]);
+
+  // Prepare animations
+  const prepare = () => {
+    if (!algo || baseArray.length === 0) return;
+    let anims = [];
+    if (algo === 'bubble') anims = bubbleSort(baseArray);
+    if (algo === 'selection') anims = selectionSort(baseArray);
+    if (algo === 'merge') anims = MergeSort(baseArray);
+    setAnimations(anims);
+    setArray([...baseArray]);
+    setStepIdx(0);
   };
+
+  // Controls
+  const handlePlay = () => {
+    if (!animations.length) prepare();
+    setIsPlaying(true);
+  };
+  const handlePause = () => setIsPlaying(false);
+  const handleStep = () => {
+    handlePause();
+    if (!animations.length) prepare();
+    doStep();
+  };
+  const handleReset = () => {
+    handlePause();
+    setArray([...baseArray]);
+    setStepIdx(0);
+  };
+
+  // Preset generators
+  const genRandom = () => Array.from({ length: 30 }, () => Math.floor(Math.random() * 200) + 20);
+  const genSorted = () => [...genRandom()].sort((a,b) => a-b);
+  const genReversed = () => [...genSorted()].reverse();
+  const genNearly = () => {
+    const arr = genSorted();
+    for (let k=0; k<10; k++) {
+      const i = Math.floor(Math.random()*arr.length);
+      const j = Math.floor(Math.random()*arr.length);
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  };
+
+  const handlePreset = (type, custom = "") => {
+    let arr = [];
+    if (type === 'random') arr = genRandom();
+    else if (type === 'sorted') arr = genSorted();
+    else if (type === 'reversed') arr = genReversed();
+    else if (type === 'nearly') arr = genNearly();
+    else if (type === 'custom') {
+      arr = custom.split(",").map(x=>parseInt(x,10))
+        .filter(n=>!isNaN(n)&&n>=0&&n<=500);
+    }
+    setBaseArray(arr);
+  };
+
   return (
     <div className="App">
-      <h1>CodeKaroge?</h1>
+      <h1>Sorting Visualiser</h1>
       <Control
-        handleNewArrayGenrate={handleNewArrayGenrate}
-        handleSorting={handleSorting}
-        userInuptArray={userInuptArray}
-        setUserInuptArray={setUserInuptArray}
-        setSpeed={setSpeed}
-        reSet={reSet}
-        isSorting={isSorting}
+        algo={algo}
+        setAlgo={setAlgo}
         speed={speed}
-        selectedSorting={selectedSorting}
+        setSpeed={setSpeed}
+        isPlaying={isPlaying}
+        handlePlay={handlePlay}
+        handlePause={handlePause}
+        handleStep={handleStep}
+        handleReset={handleReset}
+        handlePreset={handlePreset}
       />
-      <Visualiser array={array} />
+      <Visualiser
+        array={array}
+        currentStep={stepIdx}
+        animations={animations}
+      />
     </div>
   );
 }

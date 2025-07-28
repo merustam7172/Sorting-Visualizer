@@ -1,0 +1,93 @@
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+    align-items: center;
+  }
+  
+  .presets button,
+  .custom button,
+  .playback button {
+    padding: 0.6rem 1rem;
+    border: none;
+    background: #1e90ff;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: background 0.3s, transform 0.2s;
+  }
+  
+  .presets button:hover,
+  .custom button:hover,
+  .playback button:hover {
+    background: #1c86ee;
+    transform: translateY(-2px);
+  }
+  
+  .presets button:disabled,
+  .custom button:disabled,
+  .playback button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+  
+  .custom input {
+    width: 140px;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+  }
+  .custom input:focus {
+    outline: none;
+    border-color: #1e90ff;
+  }
+  
+  .algo select,
+  .speed input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+  }
+  .algo select:focus,
+  .speed input:focus {
+    outline: none;
+    border-color: #1e90ff;
+  }
+  
+  .speed label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  .presets button, .custom button, .playback button {
+    margin: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    border: none;
+    background: #1890ff;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .presets button:disabled, .custom button:disabled, .playback button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .custom input { width: 120px; padding: 0.3rem; }
+  .algo select, .speed input { padding: 0.3rem; }
+  .speed label { display:flex; align-items:center; gap:0.3rem; }

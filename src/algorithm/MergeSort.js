@@ -1,60 +1,43 @@
-export const MergeSort = (array) => {
-    const animations = [];
-    if (array.length <= 1) return animations;
-  
-    const auxiliaryArray = array.slice();
-    const sortedArray = array.slice();
-    
-    mergeSortHelper(sortedArray, 0, sortedArray.length - 1, auxiliaryArray, animations);
-    return animations;
-  };
-  
-  const mergeSortHelper = (sortedArray, startIdx, endIdx, auxiliaryArray, animations) => {
-    if (startIdx === endIdx) return;
-  
-    const middleIdx = Math.floor((startIdx + endIdx) / 2);
-    mergeSortHelper(auxiliaryArray, startIdx, middleIdx, sortedArray, animations);
-    mergeSortHelper(auxiliaryArray, middleIdx + 1, endIdx, sortedArray, animations);
-  
-    doMerge(sortedArray, startIdx, middleIdx, endIdx, auxiliaryArray, animations);
-  };
-  
-  const doMerge = (sortedArray, startIdx, middleIdx, endIdx, auxiliaryArray, animations) => {
-    let k = startIdx;
-    let i = startIdx;
-    let j = middleIdx + 1;
-  
-    while (i <= middleIdx && j <= endIdx) {
-      // Push two indices that are being compared
-      animations.push([i, j]);
-      // Push two indices again, to change their color back
-      animations.push([i, j]);
-  
-      if (auxiliaryArray[i] <= auxiliaryArray[j]) {
-        // Push index and its new height
-        animations.push([k, auxiliaryArray[i]]);
-        sortedArray[k++] = auxiliaryArray[i++]; // Update the sortedArray copy
-      } else {
-        // Push index and its new height
-        animations.push([k, auxiliaryArray[j]]);
-        sortedArray[k++] = auxiliaryArray[j++]; // Update the sortedArray copy
-      }
+export function MergeSort(array) {
+  const animations = [];
+  if (array.length <= 1) return animations;
+  const aux = array.slice();
+  const main = array.slice();
+  mergeHelper(main, 0, main.length-1, aux, animations);
+  return animations;
+}
+
+function mergeHelper(main, start, end, aux, animations) {
+  if (start === end) return;
+  const mid = Math.floor((start+end)/2);
+  mergeHelper(aux, start, mid, main, animations);
+  mergeHelper(aux, mid+1, end, main, animations);
+  doMerge(main, start, mid, end, aux, animations);
+}
+
+function doMerge(main, start, mid, end, aux, animations) {
+  let i=start, j=mid+1, k=start;
+  while (i<=mid && j<=end) {
+    animations.push({ type:'compare', i, j });
+    animations.push({ type:'revert', i, j });
+    if (aux[i] <= aux[j]) {
+      animations.push({ type:'overwrite', index:k, value:aux[i] });
+      main[k++] = aux[i++];
+    } else {
+      animations.push({ type:'overwrite', index:k, value:aux[j] });
+      main[k++] = aux[j++];
     }
-  
-    while (i <= middleIdx) {
-      animations.push([i, i]);
-      animations.push([i, i]);
-  
-      animations.push([k, auxiliaryArray[i]]);
-      sortedArray[k++] = auxiliaryArray[i++]; // Update the sortedArray copy
-    }
-  
-    while (j <= endIdx) {
-      animations.push([j, j]);
-      animations.push([j, j]);
-  
-      animations.push([k, auxiliaryArray[j]]);
-      sortedArray[k++] = auxiliaryArray[j++]; // Update the sortedArray copy
-    }
-  };
-  
+  }
+  while (i<=mid) {
+    animations.push({ type:'compare', i, j:i });
+    animations.push({ type:'revert', i, j:i });
+    animations.push({ type:'overwrite', index:k, value:aux[i] });
+    main[k++] = aux[i++];
+  }
+  while (j<=end) {
+    animations.push({ type:'compare', i:j, j });
+    animations.push({ type:'revert', i:j, j });
+    animations.push({ type:'overwrite', index:k, value:aux[j] });
+    main[k++] = aux[j++];
+  }
+}
